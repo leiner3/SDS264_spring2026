@@ -1,0 +1,12 @@
+---
+title: "Daily Commit"
+format: pdf
+editor: visual
+---
+
+## My Daily Commit Diary
+
+#### Thursday, Feb 12, 2026
+
+Yay! A new commitment!
+changeeeee2 change
