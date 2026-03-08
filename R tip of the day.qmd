@@ -1,0 +1,201 @@
+---
+title: "R Tip of the Day"
+subtitle: "Interactive Maps with {leaflet}"
+author: "Willemijn Leiner"
+format:
+  revealjs:
+    theme: moon
+    slide-number: true
+    chalkboard: true
+editor: visual
+---
+
+```{r}
+library(sf)
+library(leaflet)
+library(dplyr)
+```
+
+## What is {leaflet}?
+
+- `{leaflet}` lets you build **interactive maps in R**
+- Based on the **Leaflet JavaScript library**, which also powers many web pages 
+- with the `{leaflet}` package you can do some cool things: 
+- display geographical data!
+- add markers and shapes
+- interactive popups 
+
+## What is it useful for?
+
+- Interactive maps are useful for a lot of things: 
+  - city planning
+  - environmental science
+  - visualization in research
+  - transportation data
+
+- Personal Interest in maps!
+  - Reminds me of GIS mapping
+  - TimeGuesser
+  - I grew up in **Utrecht in the Netherlands**
+
+
+## Basic Map of the World
+
+```{.r code-line-numbers="1|2"}
+leaflet() %>%
+  addProviderTiles("CartoDB.Positron")
+```
+
+- **leaflet()** initializes a new interactive map
+- **%>%** passes the map object to the next function
+- **addProviderTiles("CartoDB.Positron")** adds the background map layer
+
+## Basic Map of the World
+
+```{r}
+leaflet() %>%
+  addProviderTiles("CartoDB.Positron")
+```
+
+## Zooming in on a Location
+
+```{.r code-line-numbers="1-2|4|6|7-10"}
+utrecht_lat <- 52.0907
+utrecht_lng <- 5.1214
+
+leaflet() %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  setView(lng = utrecht_lng, lat = utrecht_lat, zoom = 13) %>%
+  addMarkers(
+    lng = utrecht_lng,
+    lat = utrecht_lat,
+    popup = "Utrecht"
+  )
+```
+
+- store **latitude and longitude** of Utrecht
+- **leaflet()** creates this interactive map 
+- **setView()** centers the map and controls the zoom level
+- **addMarkers()** adds a clickable popup marker 
+
+## Zooming in on a Location
+
+```{r}
+utrecht_lat <- 52.0907
+utrecht_lng <- 5.1214
+
+leaflet() %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  setView(lng = utrecht_lng, lat = utrecht_lat, zoom = 13) %>%
+  addMarkers(lng = utrecht_lng,
+             lat = utrecht_lat,
+             popup = "Utrecht")
+```
+
+## The best places to be in Utrecht!
+
+```{.r code-line-numbers="1-12|13-21"}
+bike_spots <- data.frame(
+  name = c(
+    "Utrecht Centraal – Jaarbeurszijde",
+    "De Dom Toren (The Dumb Tower)",
+    "Atletiekbaan Maarschalkerweerd - U-Track Club",
+    "My House!",
+    "Favorite Place!",
+    "Wilhelmina Park"
+  ),
+  lat = c(52.0894, 52.090663, 52.078978, 52.085239, 52.092751, 52.087659),
+  lng = c(5.1100, 5.121204, 5.156714, 5.147264, 5.12208, 5.140606),
+
+  capacity = c(12500, 6000, 50, 4, 30, 250),
+
+  image = c(
+    "",
+    "https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/unnamed.jpg",
+    "https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/IMG_0416.jpeg",
+    "https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/my_house.jpeg",
+    "https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/favoriete_restaurant.jpeg",
+    "https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/wilhelmina_park.jpeg"
+  )
+)
+```
+
+- First create data frame: each row represents one location
+- Store coordinates using latitude and longitude + extra information
+
+## The best places to be in Utrecht!
+
+```{.r code-line-numbers="1|2|3"}
+leaflet(bike_spots) %>%
+  addProviderTiles("OpenStreetMap") %>%
+  setView(lng = 5.1214, lat = 52.0907, zoom = 13)
+```
+
+- **leaflet(bike_spots)** to clarify data
+- **addProviderTiles()** for the background map
+- **setView()** centers the map 
+
+## The best places to be in Utrecht!
+
+```{.r code-line-numbers="1-5|6-11"}
+  addCircleMarkers(
+    ~lng, ~lat,
+    radius = 5,
+    color = "red",
+    fillOpacity = 0.9,
+    popup = ~paste0(
+      "<b>", name, "</b><br>",
+      "Capacity: ", capacity, " bikes<br>",
+      "<img src='", image, "' width='200px'>"
+    )
+  )
+```
+
+- **addCircleMarkers()** and **~lng, ~lat, ** tell leaflet to add markers to the locations I have earlier mapped out
+- **popup** allows HTML content which are the popups. 
+
+## The best places to be in Utrecht!
+
+```{r}
+
+library(leaflet)
+
+bike_spots <- data.frame(
+  name = c(
+    "Utrecht Centraal – Jaarbeurszijde",
+    "De Dom Toren (The Dumb Tower)",
+    "Atletiekbaan Maarschalkerweerd - U-Track Club",
+    "My House!", 
+    "Favorite PLace!", 
+    "Wilhelmina Park"
+  ),
+  lat = c(52.0894, 52.090663, 52.078978, 52.085239, 52.092751, 52.087659),
+  lng = c(5.1100, 5.121204, 5.156714, 5.147264, 5.12208, 5.140606),
+  capacity = c(12500, 6000, 50, 4, 30, 250),
+  image = c(
+  "", 
+  'https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/unnamed.jpg', 
+  'https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/IMG_0416.jpeg', 
+  'https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/my_house.jpeg',
+  'https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/favoriete_restaurant.jpeg', 
+  'https://raw.githubusercontent.com/leiner3/SDS264_spring2026/main/wilhelmina_park.jpeg
+'
+  )
+)
+
+leaflet(bike_spots) %>%
+  addProviderTiles("OpenStreetMap") %>% # Here I added the provider tiles "OpenStreetMap", which is the most descriptive map of all of the other tiles I have tried. 
+  setView(lng = 5.1214, lat = 52.0907, zoom = 13) %>%
+  addCircleMarkers(
+    ~lng, ~lat,
+    radius = 4,
+    color = "red",
+    fillOpacity = 0.9,
+    popup = ~paste0(
+      "<b>", name, "</b><br>",
+      "Capacity: ", capacity, " bikes<br>",
+      "<img src='", image, "' width='200px'>"
+    )
+  )
+```
+
